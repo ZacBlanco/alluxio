@@ -12,11 +12,19 @@
 package alluxio.util;
 
 import alluxio.AlluxioURI;
+import alluxio.collections.Pair;
+import alluxio.underfs.UfsStatus;
+import alluxio.underfs.UfsStatusTree;
 import alluxio.underfs.UnderFileSystem;
 import alluxio.underfs.options.DeleteOptions;
+import alluxio.util.io.PathUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -163,6 +171,42 @@ public final class UnderFileSystemUtils {
     sb.append(modTime);
     sb.append(')');
     return sb.toString();
+  }
+
+  public static UfsStatusTree buildUfsStatusTree(String path, UnderFileSystem ufs)
+      throws IOException {
+    UfsStatusTree.Builder treeBuilder = new UfsStatusTree.Builder(path);
+    path = new AlluxioURI(path).toString();
+    // Each element is a pair of (full path, UfsStatus)
+    Queue<Pair<String, UfsStatus>> pathsToProcess = new ArrayDeque<>();
+    // We call list initially, so we can return null if the path doesn't denote a directory
+    UfsStatus[] statuses = ufs.listStatus(path);
+    if (statuses == null) {
+      return null;
+    } else {
+      for (UfsStatus status : statuses) {
+        pathsToProcess.add(new Pair<>(PathUtils.concatPath(path, status.getName()), status));
+      }
+    }
+    while (!pathsToProcess.isEmpty()) {
+      final Pair<String, UfsStatus> pathToProcessPair = pathsToProcess.remove();
+      final String pathToProcess = pathToProcessPair.getFirst();
+      UfsStatus pathStatus = pathToProcessPair.getSecond();
+      treeBuilder.addUfsStatus(pathStatus.setName(pathToProcess.substring(path.length() + 1)));
+
+      if (pathStatus.isDirectory()) {
+        // Add all of its subpaths
+        UfsStatus[] children = ufs.listStatus(pathToProcess);
+        if (children != null) {
+          for (UfsStatus child : children) {
+            pathsToProcess.add(
+                new Pair<>(PathUtils.concatPath(pathToProcess, child.getName()), child));
+          }
+        }
+      }
+    }
+
+    return treeBuilder.build();
   }
 
   private UnderFileSystemUtils() {} // prevent instantiation

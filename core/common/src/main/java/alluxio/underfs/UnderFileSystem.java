@@ -595,7 +595,7 @@ public interface UnderFileSystem extends Closeable {
   /**
    * Opens an {@link InputStream} for a file in under filesystem at the indicated path.
    *
-   * Similar to {@link #open(fString)} but
+   * Similar to {@link #open(String)} but
    * deals with the write-then-read eventual consistency issue.
    *
    * @param path the file name
