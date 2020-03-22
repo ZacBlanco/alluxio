@@ -3696,7 +3696,7 @@ public final class DefaultFileSystemMaster extends CoreMaster
    * @param opTimeMs the operation time (in milliseconds)
    * @param context the method context
    */
-  private void setAttributeSingleFile(RpcContext rpcContext, LockedInodePath inodePath,
+  protected void setAttributeSingleFile(RpcContext rpcContext, LockedInodePath inodePath,
       boolean updateUfs, long opTimeMs, SetAttributeContext context)
       throws FileDoesNotExistException, InvalidPathException, AccessControlException {
     Inode inode = inodePath.getInode();

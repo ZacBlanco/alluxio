@@ -12,6 +12,9 @@
 package alluxio.master.file.meta;
 
 import alluxio.AlluxioURI;
+import alluxio.conf.PropertyKey;
+import alluxio.conf.ServerConfiguration;
+import alluxio.grpc.FileSystemMasterCommonPOptions;
 import alluxio.master.file.meta.InodeTree.LockPattern;
 
 import javax.annotation.concurrent.ThreadSafe;
@@ -36,6 +39,22 @@ public final class LockingScheme {
     mPath = path;
     mDesiredLockPattern = desiredLockPattern;
     mShouldSync = shouldSync;
+  }
+
+  public LockingScheme(AlluxioURI path, LockPattern desiredPattern,
+      FileSystemMasterCommonPOptions options, UfsSyncPathCache pathCache, boolean isGetFileInfo) {
+    mPath = path;
+    mDesiredLockPattern = desiredPattern;
+    // If client options didn't specify the interval, fallback to whatever the server has
+    // configured to prevent unnecessary syncing due to the default value being 0
+    long syncInterval = options.hasSyncIntervalMs() ? options.getSyncIntervalMs() :
+        ServerConfiguration.getMs(PropertyKey.USER_FILE_METADATA_SYNC_INTERVAL);
+    mShouldSync = pathCache.shouldSyncPath(path.getPath(), syncInterval, isGetFileInfo);
+  }
+
+  public LockingScheme(AlluxioURI path, LockPattern desiredPattern,
+      FileSystemMasterCommonPOptions options, UfsSyncPathCache pathCache) {
+    this(path, desiredPattern, options, pathCache, false);
   }
 
   /**
