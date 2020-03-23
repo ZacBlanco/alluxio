@@ -176,7 +176,6 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -1146,7 +1145,7 @@ public final class DefaultFileSystemMaster extends CoreMaster
    * @param inodePath the {@link LockedInodePath} to complete
    * @param context the method context
    */
-  private void completeFileInternal(RpcContext rpcContext, LockedInodePath inodePath,
+  void completeFileInternal(RpcContext rpcContext, LockedInodePath inodePath,
       CompleteFileContext context)
       throws InvalidPathException, FileDoesNotExistException, BlockInfoException,
       FileAlreadyCompletedException, InvalidFileSizeException, UnavailableException {
@@ -1891,7 +1890,7 @@ public final class DefaultFileSystemMaster extends CoreMaster
    * @param context method context
    * @return a list of created inodes
    */
-  private List<Inode> createDirectoryInternal(RpcContext rpcContext, LockedInodePath inodePath,
+  List<Inode> createDirectoryInternal(RpcContext rpcContext, LockedInodePath inodePath,
       CreateDirectoryContext context) throws InvalidPathException, FileAlreadyExistsException,
       IOException, FileDoesNotExistException {
     Preconditions.checkState(inodePath.getLockPattern() == LockPattern.WRITE_EDGE);
@@ -3315,19 +3314,23 @@ public final class DefaultFileSystemMaster extends CoreMaster
 
   private boolean syncMetadata(RpcContext rpcContext, LockedInodePath inodePath,
       LockingScheme lockingScheme, DescendantType syncDescendantType) {
-    boolean result;
-    if (!lockingScheme.shouldSync()) {
-      return false;
-    }
-    try {
-      result = syncMetadataInternal(rpcContext, inodePath, lockingScheme,
-          syncDescendantType, populateStatusCache(inodePath.getUri(), syncDescendantType));
-    } catch (Exception e) {
-      LOG.warn("Sync metadata for path {} encountered exception {}", inodePath.getUri(),
-          Throwables.getStackTraceAsString(e));
-      return false;
-    }
-    return result;
+//    boolean result;
+//    if (!lockingScheme.shouldSync()) {
+//      return false;
+//    }
+//    try {
+//      result = syncMetadataInternal(rpcContext, inodePath, lockingScheme,
+//          syncDescendantType, populateStatusCache(inodePath.getUri(), syncDescendantType));
+//    } catch (Exception e) {
+//      LOG.warn("Sync metadata for path {} encountered exception {}", inodePath.getUri(),
+//          Throwables.getStackTraceAsString(e));
+//      return false;
+//    }
+//    return result;
+    InodeSyncStream sync = new InodeSyncStream(inodePath.getUri(), this, mInodeTree, mInodeStore,
+        mInodeLockManager, mMountTable, rpcContext, syncDescendantType, mUfsSyncPathCache,
+        FileSystemMasterCommonPOptions.getDefaultInstance(), false);
+    return sync.sync();
   }
 
   private UfsStatusCache populateStatusCache(AlluxioURI path,
@@ -4637,7 +4640,7 @@ public final class DefaultFileSystemMaster extends CoreMaster
     return new LockingScheme(path, desiredLockMode, shouldSync);
   }
 
-  private boolean isAclEnabled() {
+  boolean isAclEnabled() {
     return ServerConfiguration.getBoolean(PropertyKey.SECURITY_AUTHORIZATION_PERMISSION_ENABLED);
   }
 

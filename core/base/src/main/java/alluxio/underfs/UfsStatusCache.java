@@ -69,7 +69,8 @@ public class UfsStatusCache {
   }
 
   /**
-   * Remove a status from the status cache
+   * Remove a status from the status cache.
+   *
    * @param key the {@link AlluxioURI} for the status
    * @return the status that the cache stored, or none
    */

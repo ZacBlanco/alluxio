@@ -41,6 +41,15 @@ public final class LockingScheme {
     mShouldSync = shouldSync;
   }
 
+  /**
+   * Create a new {@link LockingScheme}.
+   *
+   * @param path a
+   * @param desiredPattern a
+   * @param options a
+   * @param pathCache a
+   * @param isGetFileInfo a
+   */
   public LockingScheme(AlluxioURI path, LockPattern desiredPattern,
       FileSystemMasterCommonPOptions options, UfsSyncPathCache pathCache, boolean isGetFileInfo) {
     mPath = path;
@@ -50,11 +59,6 @@ public final class LockingScheme {
     long syncInterval = options.hasSyncIntervalMs() ? options.getSyncIntervalMs() :
         ServerConfiguration.getMs(PropertyKey.USER_FILE_METADATA_SYNC_INTERVAL);
     mShouldSync = pathCache.shouldSyncPath(path.getPath(), syncInterval, isGetFileInfo);
-  }
-
-  public LockingScheme(AlluxioURI path, LockPattern desiredPattern,
-      FileSystemMasterCommonPOptions options, UfsSyncPathCache pathCache) {
-    this(path, desiredPattern, options, pathCache, false);
   }
 
   /**
