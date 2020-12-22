@@ -7,15 +7,11 @@ codecov:
   notify:
     after_n_builds: 1
     wait_for_ci: yes
-  coverage:
-    precision: 2
-    range: "70...100"
-    notify:
-      # notification blocks. See: https://docs.codecov.io/docs/codecovyml-reference#section-coverage-notify
-    status:
-      project:
-      patch:
-      changes:
+coverage:
+  precision: 2
+  range: "70...100"
+  # notify:
+  #   # notification blocks. See: https://docs.codecov.io/docs/codecovyml-reference#section-coverage-notify
 comment:
   layout: "reach, diff, flags, files"
   behavior: default
@@ -24,5 +20,5 @@ comment:
   require_head: yes       # [yes :: must have a head report to post]
   branches:               # branch names that can post comment
     - master
-  after_n_builds: <number> #e.g., 5. The number of uploaded reports codecov
+  after_n_builds: 1 #e.g., 5. The number of uploaded reports codecov
 
