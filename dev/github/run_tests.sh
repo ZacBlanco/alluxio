@@ -54,12 +54,13 @@ JAVA_HOME=${JAVA_HOME_BACKUP}
 PATH=${PATH_BACKUP}
 
 # Run tests
-mvn -Duser.home=/home/jenkins test  -Pjacoco -PjacocoReport -Pdeveloper -Dmaven.main.skip -Dskip.protoc=true -Dmaven.javadoc.skip -Dlicense.skip=true \
+mvn -Duser.home=/home/jenkins test -Pjacoco -Pdeveloper -Dmaven.main.skip -Dskip.protoc=true -Dmaven.javadoc.skip -Dlicense.skip=true \
 -Dcheckstyle.skip=true -Dfindbugs.skip=true -Dsurefire.forkCount=2 ${mvn_args} $@
 
 # Generate coverage reports
-mvn -Duser.home=/home/jenkins verify -PjacocoReport -Pdeveloper -Dmaven.main.skip -DskipTests -Dskip.protoc=true -Dmaven.javadoc.skip -Dlicense.skip=true \
--Dcheckstyle.skip=true -Dfindbugs.skip=true ${mvn_args} $@
+mvn -T 4C -Dfindbugs.skip -Dcheckstyle.skip -DskipTests -Dmaven.javadoc.skip -Dlicense.skip \
+-PjacocoReport jacoco:report -pl '!webui,!shaded,!shaded/client,!shaded/hadoop' \
+-Djacoco.dataFile='${build.path}/../target/jacoco-combined.exec'
 
 # mvn verify -PjacocoReport -Pdeveloper -Dmaven.main.skip -DskipTests -Dskip.protoc=true -Dmaven.javadoc.skip -Dlicense.skip=true \
 # -Dcheckstyle.skip=true -Dfindbugs.skip=true ${mvn_args} $@
