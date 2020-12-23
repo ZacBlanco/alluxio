@@ -58,4 +58,4 @@ jobs:
             **/target/logs/*
             log*
           retention-days: 7
-      - uses: ./.github/workflows/coverage-action/coverage.yml
+      - uses: ./.github/workflows/coverage-action
