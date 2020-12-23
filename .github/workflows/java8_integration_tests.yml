@@ -78,7 +78,7 @@ jobs:
           # token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           # files:  # optional
           file: ./**/target/site/jacoco/jacoco.xml # optional
-          # flags: unittests # optional
           name: codecov-umbrella # optional
           fail_ci_if_error: true # optional (default = false)
-          verbose: true # optional (default = false)
+          verbose: false # optional (default = false)
+      - uses: ./.github/workflows/coverage-action/coverage.yml

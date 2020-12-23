@@ -1,0 +1,15 @@
+name: "Code Coverage"
+description: "upload code coverage report to codecov.io"
+runs:
+  using: "composite"
+  steps:
+    - name: "Code cov"
+      uses: codecov/codecov-action@v1
+      with:
+        # token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+        # files:  # optional
+        file: ./**/target/site/jacoco/jacoco.xml # optional
+        # flags: unittests # optional
+        name: codecov-umbrella # optional
+        fail_ci_if_error: true # optional (default = false)
+        verbose: true # optional (default = false)

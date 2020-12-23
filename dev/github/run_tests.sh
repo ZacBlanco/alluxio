@@ -53,5 +53,13 @@ export MAVEN_OPTS="-Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simple
 JAVA_HOME=${JAVA_HOME_BACKUP}
 PATH=${PATH_BACKUP}
 
-mvn -Duser.home=/home/jenkins test -Pdeveloper -Dmaven.main.skip -Dskip.protoc=true -Dmaven.javadoc.skip -Dlicense.skip=true \
+# Run tests
+mvn -Duser.home=/home/jenkins test  -Pjacoco -PjacocoReport -Pdeveloper -Dmaven.main.skip -Dskip.protoc=true -Dmaven.javadoc.skip -Dlicense.skip=true \
 -Dcheckstyle.skip=true -Dfindbugs.skip=true -Dsurefire.forkCount=2 ${mvn_args} $@
+
+# Generate coverage reports
+mvn -Duser.home=/home/jenkins verify -PjacocoReport -Pdeveloper -Dmaven.main.skip -DskipTests -Dskip.protoc=true -Dmaven.javadoc.skip -Dlicense.skip=true \
+-Dcheckstyle.skip=true -Dfindbugs.skip=true ${mvn_args} $@
+
+# mvn verify -PjacocoReport -Pdeveloper -Dmaven.main.skip -DskipTests -Dskip.protoc=true -Dmaven.javadoc.skip -Dlicense.skip=true \
+# -Dcheckstyle.skip=true -Dfindbugs.skip=true ${mvn_args} $@
