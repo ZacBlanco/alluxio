@@ -71,7 +71,7 @@ public final class ExternalProcess {
    */
   public synchronized void stop() {
     if (mProcess != null) {
-      mProcess.destroyForcibly();
+      mProcess.destroy();
       mProcess = null;
     }
   }
