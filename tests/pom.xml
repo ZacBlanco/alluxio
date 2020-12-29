@@ -340,6 +340,11 @@
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
             <version>${jacoco.version}</version>
+            <configuration>
+              <excludes>
+                <exclude>**/alluxio/server/ft/**</exclude>
+              </excludes>
+            </configuration>
             <!-- integration tests shouldn't use PowerMock, so recommended prepare-agent goal can be used, instead of offline-instrumentation -->
             <executions>
               <execution>
